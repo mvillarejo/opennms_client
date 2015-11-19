@@ -1,3 +1,5 @@
 *.pyc
 .DS_Store
+.idea/
+opennms-client.log
 test_client_prod.py
