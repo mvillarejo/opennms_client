@@ -7,6 +7,21 @@ opennms-client
 opennms-client is a simple package to manage openNMS.
 
 Usage
+.. code-block:: python
+
+    >>> import client
+    >>> onms_client = client.Client("http://demo.opennms.org/opennms", "demo", "demo")
+    >>> print onms_client
+    http://demo.opennms.org/opennms (demo) <Response [200]>
+    >>> onms_client.get_services()
+    {u'Amazon': 35,
+     u'BingSearch': 38,
+     u'DNS': 12,
+     u'Dell-OpenManage': 24,
+     u'FTP': 10,
+     u'GoogleSearch': 36,
+    ...
+
 (TBC)
 
 License
