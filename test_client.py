@@ -13,7 +13,7 @@ class OpenNMSClientTestCase(unittest.TestCase):
     # _multiprocess_can_split_ = True
 
     def setUp(self):
-        pass
+        self.client = client.Client("http://demo.opennms.org/opennms", "demo", "demo")
 
     def tearDown(self):
         pass
@@ -23,6 +23,10 @@ class OpenNMSClientTestCase(unittest.TestCase):
 
     def testInvalidHost(self):
         self.assertRaises(OpenNMSClientConnectError, client.Client, "http://demo.opennms.org", "non_user", "non_password")
+
+    def testGetServices(self):
+        self.client.get_services()
+        self.assertEqual(self.client.services["ICMP"], 1)
 
     # TODO: the API is not available online so can not test any further...
 
