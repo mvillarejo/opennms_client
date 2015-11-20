@@ -11,7 +11,7 @@ This module implements client connection with openNMS servers
 
 from .log import logger
 from urls import urls
-from exceptions import OpenNMSClientConnectError, MoreThanOneNodeReturnedError
+from exceptions import OpenNMSClientConnectError, MoreThanOneNodeReturnedError, MoreThanOneIpInterfaceReturnedError
 
 import operator
 import requests
@@ -29,9 +29,10 @@ class Client(object):
         :return:
         """
         self.url = url
-        self.url_rest = "{}/opennms/rest".format(self.url)
+        self.url_rest = "{}/rest".format(self.url)
         self.user = user
         self.password = password
+        self.services = {}
 
         if debug:  # save full log to file
             self.logger = logger(save=True)
@@ -74,18 +75,50 @@ class Client(object):
         response = self.__request__(url).json()
         return response.get('node', {})
 
-    def get_node(self, query):
+    def get_node(self, hostname):
         """
         Return node details using REST interface
-        :param query: hostname string to get the node
+        :param hostname: hostname string to get the node
         :return: node details
         """
-        url = "{0}/{1}/?comparator=ilike&label={2}%25&limit=0".format(self.url_rest, urls['node'], query)
+        url = "{0}/{1}/?comparator=ilike&label={2}%25&limit=0".format(self.url_rest, urls['nodes'], hostname)
         response = self.__request__(url).json()
         if response.get('totalCount', 0) > 1:
-            raise MoreThanOneNodeReturnedError(reason="More than one node was returned with query: {}".format(query))
+            raise MoreThanOneNodeReturnedError(reason="More than one node was returned with hostname: {}".format(hostname))
         else:
             return response.get('node', {})[0]
+
+    def get_ipinterfaces(self, hostname, node_id=0, principal=False):
+        """
+        Returns a list of interfaces give a hostname/node_id
+        :param hostname: Hostname of the host to get interfaces from
+        :param node_id: #TODO (optional) node_id so no query for get_node() will be needed
+        :param principal: return a single interface, the primary
+        :return:
+        """
+        node = self.get_node(hostname)
+        # /nodes/{id}/ipinterfaces
+        url = "{0}/{1}/{2}/{3}".format(self.url_rest, urls['nodes'], node.get('id'), urls['ipinterfaces'])
+        response = self.__request__(url).json()
+        if principal:
+            if response.get('totalCount', 0) > 1:
+                raise MoreThanOneIpInterfaceReturnedError(
+                    reason="More than one ip interface was returned for hostname: {} (principal={})".format(hostname, principal)
+                )
+            else:
+                # TODO: check that 'snmpPrimary': 'P'
+                return response.get('ipInterface', {})[0]
+        else:
+            return response.get('ipInterface', {})
+
+    def get_ipinterface_principal(self, hostname, node_id=0):
+        """
+        Returns node principal interface
+        :param hostname:
+        :param node_id:
+        :return:
+        """
+        return self.get_ipinterfaces(hostname, node_id, principal=True)
 
     def get_services(self, limit=10):
         """
@@ -96,18 +129,16 @@ class Client(object):
         # TODO: this should be collected using REST API but it's not available as version 1.6
         url = "{}/{}".format(self.url, urls['services'])
         response = self.__request__(url)
-        print response
-        html = bs(response.content)
+        html = bs(response.content, "html.parser")
 
-        list_unsorted = {
-            item.text: item.get('value')
-            for item in html.find_all('option') if item.parent.get('id') == "byservice_service"
-        }
-        # Now sort them by name
-        list_sorted = sorted(list_unsorted.items(), key=operator.itemgetter(0))
-        return list_sorted
+        for item in html.find_all('option'):
+            if item.parent.get('id') == "byservice_service":
+                self.services[item.text] = int(item.get('value'))
+
+        return self.services
 
     def disconnect(self):
+        """close session."""
         return self.session.close()
 
     def __str__(self):

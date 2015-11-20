@@ -26,3 +26,6 @@ class OpenNMSClientConnectError(OpenNMSClientError):
 
 class MoreThanOneNodeReturnedError(OpenNMSClientError):
     """More than one node was returned with query supplied."""
+
+class MoreThanOneIpInterfaceReturnedError(OpenNMSClientError):
+    """More than one ip interface was returned when only principal was requested."""
