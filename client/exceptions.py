@@ -23,9 +23,14 @@ class UnknownError(OpenNMSClientError):
 class OpenNMSClientConnectError(OpenNMSClientError):
     """Can Not Connect to openNMS server"""
 
+class NodeDoesNotExistError(OpenNMSClientError):
+    """Node does not exist."""
 
 class MoreThanOneNodeReturnedError(OpenNMSClientError):
     """More than one node was returned with query supplied."""
 
 class MoreThanOneIpInterfaceReturnedError(OpenNMSClientError):
     """More than one ip interface was returned when only principal was requested."""
+
+class ServiceDoesNotExistError(OpenNMSClientError):
+    """Service does not exist."""

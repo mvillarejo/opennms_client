@@ -10,10 +10,11 @@ This module implements client connection with openNMS servers
 
 
 from .log import logger
-from urls import urls
-from exceptions import OpenNMSClientConnectError, MoreThanOneNodeReturnedError, MoreThanOneIpInterfaceReturnedError
+from .urls import urls
+from .templates import templates
+from exceptions import OpenNMSClientConnectError, MoreThanOneNodeReturnedError, MoreThanOneIpInterfaceReturnedError, \
+    NodeDoesNotExistError, ServiceDoesNotExistError
 
-import operator
 import requests
 from bs4 import BeautifulSoup as bs
 
@@ -51,17 +52,26 @@ class Client(object):
         else:
             self.logger.debug("Successfully logged in")
 
-    def __request__(self, url, method="GET"):
+    def __request__(self, url, method="GET", data=None, headers={"Accept": "application/json"}):
         """
         Internal requests method with all the requirements to return json
         :param url:
+        :type method: http method
+        :type data: payload
+        :type headers: headers to attach to the request
         :return:
         """
-        self.logger.debug("Requesting URL: {}".format(url))
-        self.response = self.session.request(method, url,
+        self.logger.debug("Requesting URL: {} {} (h:{}) (d:{})".format(method, url, headers, data))
+        if method == "POST":
+            self.response = self.session.post(url, data=data,
                                              auth=(self.user, self.password) if self.user else None,
-                                             headers={"Accept": "application/json"},
+                                             headers=headers,
                                              verify=True)
+        else:
+            self.response = self.session.get(url, data=data,
+                                                 auth=(self.user, self.password) if self.user else None,
+                                                 headers=headers,
+                                                 verify=True)
         self.logger.debug("Request completed. {}".format(self.response))
         return self.response
 
@@ -85,6 +95,10 @@ class Client(object):
         response = self.__request__(url).json()
         if response.get('totalCount', 0) > 1:
             raise MoreThanOneNodeReturnedError(reason="More than one node was returned with hostname: {}".format(hostname))
+        elif response.get('totalCount', 0) == 0:
+            raise NodeDoesNotExistError(
+                reason="Node with name {} does not exist ".format(hostname)
+            )
         else:
             return response.get('node', {})[0]
 
@@ -120,7 +134,7 @@ class Client(object):
         """
         return self.get_ipinterfaces(hostname, node_id, principal=True)
 
-    def get_services(self, limit=10):
+    def get_services(self):
         """
         Return a list of services using WEB interface
         :param limit: amount of services
@@ -136,6 +150,30 @@ class Client(object):
                 self.services[item.text] = int(item.get('value'))
 
         return self.services
+
+    def set_service(self, hostname, service_name):
+        """
+        Add a service to a hostname
+        :param hostname:
+        :param service_name:
+        :return:
+        """
+        node = self.get_node(hostname)
+        ip_interface = self.get_ipinterface_principal(hostname)
+        # get all the services
+        self.get_services()
+        if self.services.get(service_name, None):
+            data = templates['services'].substitute(id=self.services[service_name], name=service_name)
+            # /opennms/rest/nodes/<node_id>/ipinterfaces/<interface>/services
+            url = "{0}/{1}/{2}/{3}/{4}/services".format(self.url_rest, urls['nodes'], node['id'], urls['ipinterfaces'], ip_interface['ipAddress'])
+            response = self.__request__(url, method="POST", data=data, headers={"Content-Type": "application/xml"})
+            return response
+
+        else:
+            raise ServiceDoesNotExistError(
+                reason="Service with name {} does not exist ".format(service_name)
+            )
+
 
     def disconnect(self):
         """close session."""
