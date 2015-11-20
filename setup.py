@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import os
-from setuptools import setup, find_packages
-
-
-def read(fname):
-    return open(os.path.join(os.path.dirname(__file__), fname)).read()
+import sys
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
 
 __title__ = 'opennms-client'
 __version__ = '0.1'
@@ -15,18 +15,28 @@ __license__ = 'MIT License'
 __copyright__ = 'Copyright 2015 Manuel Villarejo'
 
 packages = [
-    __title__
+    # __title__ # TODO: use something more standard
+    "client"
 ]
 
+if sys.argv[-1] == 'publish':
+    os.system('python setup.py sdist upload')
+    sys.exit()
+
+requires = []
 with open('requirements.txt') as f:
     requires = f.read().splitlines()
 
+with open('README.rst') as f1:
+    with open('CHANGELOG.rst') as f2:
+        long_desc = f1.read() + '\n\n' + f2.read()
+
 
 setup(
-    name="opennms-client",
+    name=__title__,
     version= __version__,
     description="",
-    long_description=read('README.rst'),
+    long_description=long_desc,
     url='https://github.com/mvillarejo/%s' % __title__,
     license=__license__,
     author=__author__,
@@ -35,9 +45,9 @@ setup(
     bugtrack_url='https://github.com/mvillarejo/%s/issues' % __title__,
     platforms='any',
     keywords='%s opennms client python' % __title__,
+    packages=packages,
     package_data={'': ['LICENSE']},
     package_dir={__title__: __title__},
-    packages=find_packages(exclude=['tests']),
     include_package_data=True,
     install_requires=requires,
     tests_require=[],
@@ -52,4 +62,7 @@ setup(
         'Programming Language :: Python :: Implementation :: PyPy',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
+    extras_require={
+        'security': ['pyOpenSSL>=0.15.1', 'ndg-httpsclient', 'pyasn1'],
+    },
 )
