@@ -1,26 +1,26 @@
 import os
 from setuptools import setup, find_packages
-
-from myapp import __version__
+from client import __version__, __author__, __author_email__
 
 
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
+
 requirements = []
 
 setup(
-    name = "opennms-client",
-    version = ".".join(map(str, __version__)),
-    description = "",
-    long_description = read('README.rst'),
-    url = '',
-    license = 'MIT',
-    author = 'mvillarejo',
-    author_email = '',
-    packages = find_packages(exclude=['tests']),
-    include_package_data = True,
-    classifiers = [
+    name="opennms-client",
+    version=".".join(map(str, __version__)),
+    description="",
+    long_description=read('README.rst'),
+    url='',
+    license='MIT',
+    author=__author__,
+    author_email=__author_email__,
+    packages=find_packages(exclude=['tests']),
+    include_package_data=True,
+    classifiers=[
         'Development Status :: 3 - Alpha',
         'Environment :: Console',
         'Intended Audience :: Developers',
@@ -28,8 +28,7 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
-        #'Framework :: Django',
     ],
-    install_requires = requirements,
-    tests_require = [],
+    install_requires=requirements,
+    tests_require=[],
 )

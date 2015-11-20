@@ -10,4 +10,4 @@ Usage
 (TBC)
 
 License
-MIT
+MIT License
