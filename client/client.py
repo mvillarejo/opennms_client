@@ -51,14 +51,14 @@ class Client(object):
         else:
             self.logger.debug("Successfully logged in")
 
-    def __request__(self, url):
+    def __request__(self, url, method="GET"):
         """
         Internal requests method with all the requirements to return json
         :param url:
         :return:
         """
         self.logger.debug("Requesting URL: {}".format(url))
-        self.response = self.session.request("GET", url,
+        self.response = self.session.request(method, url,
                                              auth=(self.user, self.password) if self.user else None,
                                              headers={"Accept": "application/json"},
                                              verify=True)
