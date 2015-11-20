@@ -1,4 +1,8 @@
 *.pyc
+docs/_build
+build/
+dist/
+opennms_client.egg-info/
 .DS_Store
 .idea/
 opennms-client.log

@@ -11,7 +11,7 @@ requirements = []
 
 setup(
     name="opennms-client",
-    version=".".join(map(str, __version__)),
+    version= __version__,
     description="",
     long_description=read('README.rst'),
     url='',
