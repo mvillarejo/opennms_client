@@ -6,7 +6,8 @@ opennms-client
 
 opennms-client is a simple package to manage openNMS.
 
-Usage
+## Usage
+
 .. code-block:: python
 
     >>> import client
@@ -22,12 +23,18 @@ Usage
      u'GoogleSearch': 36,
     ...
 
-(TBC)
 
-Requirements
+
+## Requirements
 ```
 pip install -r requirements.txt
 ```
 
-License
+## Releases
+Download pre-built releases on the [releases](https://github.com/mvillarejo/opennms-client/releases) page
+
+## Contributors
+[Manuel Villarejo](https://github.com/mvillarejo) - Core Development
+
+## License
 MIT License
