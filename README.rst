@@ -22,6 +22,8 @@ opennms-client is a simple package to manage openNMS.
      u'FTP': 10,
      u'GoogleSearch': 36,
     ...
+    >>> client.set_service("www.amazon.com ", "ICMP")
+    <Response [200]>
 
 
 
