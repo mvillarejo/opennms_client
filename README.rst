@@ -1,12 +1,17 @@
+==============
 opennms-client
 ==============
 
 .. image:: https://travis-ci.org/mvillarejo/opennms-client.png?branch=master
         :target: https://travis-ci.org/mvillarejo/opennms-client
+.. image:: https://readthedocs.org/projects/opennms-client/badge/?version=latest
+        :target: http://opennms-client.readthedocs.org/en/latest/?badge=latest
+
 
 opennms-client is a simple package to manage openNMS.
 
-## Usage
+Usage
+=====
 
 .. code-block:: python
 
@@ -27,16 +32,20 @@ opennms-client is a simple package to manage openNMS.
 
 
 
-## Requirements
-```
-pip install -r requirements.txt
-```
+Requirements
+============
+.. code-block:: bash
+    pip install -r requirements.txt
 
-## Releases
+
+Releases
+========
 Download pre-built releases on the [releases](https://github.com/mvillarejo/opennms-client/releases) page
 
-## Contributors
+Contributors
+============
 [Manuel Villarejo](https://github.com/mvillarejo) - Core Development
 
-## License
+License
+=======
 MIT License
