@@ -21,6 +21,8 @@ packages = [
 
 if sys.argv[-1] == 'build':
     os.system('python setup.py sdist')
+    os.system('sphinx-apidoc -f -o docs/source/ {}'.format(__title__))
+    os.system('cd docs && make html')
     sys.exit()
 
 if sys.argv[-1] == 'publish':
@@ -28,7 +30,6 @@ if sys.argv[-1] == 'publish':
     sys.exit()
 
 
-requires = []
 with open('requirements.txt') as f:
     requires = f.read().splitlines()
 
