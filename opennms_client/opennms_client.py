@@ -70,7 +70,7 @@ class OpenNMSClient(object):
         if method == "POST":
             self.response = self.session.post(url, data=data,
                                              auth=(self.user, self.password) if self.user else None,
-                                             headers=headers,
+                                             headers={"Content-Type": "application/xml"},
                                              verify=True)
         elif method == "DELETE":
             self.response = self.session.delete(url,
@@ -99,7 +99,7 @@ class OpenNMSClient(object):
     def get_node(self, hostname):
         """
         Return node details using REST interface
-        :param hostname: hostname string to get the node
+        :param hostname: hostname
         :type hostname: str
         :return: dict -- node details
         :raises: MoreThanOneNodeReturnedError, NodeDoesNotExistError
@@ -114,6 +114,19 @@ class OpenNMSClient(object):
             )
         else:
             return response.get('node', {})[0]
+
+    def delete_node(self, hostname):
+        """Delete node details using REST interface
+
+        :param hostname: hostname
+        :type hostname: str
+        :return: dict -- response
+        :raises:
+        """
+        node = self.get_node(hostname)
+        url = "{0}/{1}/{2}".format(self.url_rest, urls['nodes'], node.get('id'))
+        print url
+        return self.__request__(url, method="DELETE")
 
     def get_ipinterfaces(self, hostname, node_id=0, principal=False):
         """
@@ -164,8 +177,8 @@ class OpenNMSClient(object):
 
         return self.services
 
-    def set_service(self, hostname, service_name):
-        """ Add a service to a hostname
+    def set_node_service(self, hostname, service_name):
+        """ Add a service to a node from it's hostname
 
         :param hostname:
         :param service_name:
@@ -180,7 +193,7 @@ class OpenNMSClient(object):
             data = templates['services'].substitute(id=self.services[service_name], name=service_name)
             # /opennms/rest/nodes/<node_id>/ipinterfaces/<interface>/services
             url = "{0}/{1}/{2}/{3}/{4}/services".format(self.url_rest, urls['nodes'], node['id'], urls['ipinterfaces'], ip_interface['ipAddress'])
-            response = self.__request__(url, method="POST", data=data, headers={"Content-Type": "application/xml"})
+            response = self.__request__(url, method="POST", data=data)
             return response
 
         else:
