@@ -1,25 +1,25 @@
 # -*- coding: utf-8 -*-
 
 """
-client.client
+opennms_client.opennms_client
 ~~~~~~~~~~~~~~~~~~~~~
 
-This module implements client connection with openNMS servers
+This module implements client connection with OpenNMS servers
 
 """
-
-
-from .log import logger
-from .urls import urls
-from .templates import templates
-from exceptions import OpenNMSClientConnectError, MoreThanOneNodeReturnedError, MoreThanOneIpInterfaceReturnedError, \
-    NodeDoesNotExistError, ServiceDoesNotExistError
 
 import requests
 from bs4 import BeautifulSoup as bs
 
 
-class Client(object):
+from .log import logger
+from .urls import urls
+from .templates import templates
+from .exceptions import (OpenNMSClientConnectError, MoreThanOneNodeReturnedError, MoreThanOneIpInterfaceReturnedError,
+                         NodeDoesNotExistError, ServiceDoesNotExistError)
+
+
+class OpenNMSClient(object):
     def __init__(self, url, user, password, debug=False):
         """
         Initialize client and create a session
@@ -56,10 +56,15 @@ class Client(object):
         """
         Internal requests method with all the requirements to return json
         :param url:
-        :type method: http method
-        :type data: payload
-        :type headers: headers to attach to the request
+        :type url: str
+        :param method: http method
+        :type method: str
+        :param data: payload
+        :type data: dict
+        :param headers: headers to attach to the request
+        :type headers: dict
         :return:
+
         """
         self.logger.debug("Requesting URL: {} {} (h:{}) (d:{})".format(method, url, headers, data))
         if method == "POST":
@@ -79,7 +84,8 @@ class Client(object):
         """
         Return a list of nodes using REST interface
         :param limit: amount of nodes
-        :return: dictionary of nodes
+        :type limit: int
+        :return: dict -- dictionary of nodes
         """
         url = "{0}/{1}/?&limit={2}".format(self.url_rest, urls['nodes'], limit)
         response = self.__request__(url).json()
@@ -89,7 +95,9 @@ class Client(object):
         """
         Return node details using REST interface
         :param hostname: hostname string to get the node
-        :return: node details
+        :type hostname: str
+        :return: dict -- node details
+        :raises: MoreThanOneNodeReturnedError, NodeDoesNotExistError
         """
         url = "{0}/{1}/?comparator=ilike&label={2}%25&limit=0".format(self.url_rest, urls['nodes'], hostname)
         response = self.__request__(url).json()

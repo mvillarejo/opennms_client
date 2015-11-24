@@ -1,6 +1,7 @@
-#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 """
-client.urls
+opennms_client.urls
 ~~~~~~~~~~~~~~~~~~~~~
 This file contains mappings between methods and urls
 

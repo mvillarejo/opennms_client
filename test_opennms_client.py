@@ -4,8 +4,8 @@
 
 import unittest
 
-import client
-from client.exceptions import OpenNMSClientConnectError
+import opennms_client
+from opennms_client.exceptions import OpenNMSClientConnectError
 
 
 class OpenNMSClientTestCase(unittest.TestCase):
@@ -13,16 +13,16 @@ class OpenNMSClientTestCase(unittest.TestCase):
     # _multiprocess_can_split_ = True
 
     def setUp(self):
-        self.client = client.Client("http://demo.opennms.org/opennms", "demo", "demo")
+        self.client = opennms_client.OpenNMSClient("http://demo.opennms.org/opennms", "demo", "demo")
 
     def tearDown(self):
         pass
 
     def testEntryPoints(self):
-        client.Client
+        opennms_client.OpenNMSClient
 
     def testInvalidHost(self):
-        self.assertRaises(OpenNMSClientConnectError, client.Client, "http://demo.opennms.org", "non_user", "non_password")
+        self.assertRaises(OpenNMSClientConnectError, opennms_client.OpenNMSClient, "http://demo.opennms.org", "non_user", "non_password")
 
     def testGetServices(self):
         self.client.get_services()

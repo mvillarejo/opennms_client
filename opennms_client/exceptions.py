@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-client.exceptions
+opennms_client.exceptions
 ~~~~~~~~~~~~~~~~~~~
 This module contains the set of client's exceptions.
 """
@@ -18,7 +18,7 @@ class OpenNMSClientError(RuntimeError):
 
 class UnknownError(OpenNMSClientError):
     """Unknown error, please report full log at
-    https://github.com/mvillarejo/opennms-client/issues"""
+    https://github.com/mvillarejo/opennms_client/issues"""
 
 class OpenNMSClientConnectError(OpenNMSClientError):
     """Can Not Connect to openNMS server"""

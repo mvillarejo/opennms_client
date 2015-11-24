@@ -1,25 +1,25 @@
 ==============
-opennms-client
+opennms_client
 ==============
 
-.. image:: https://travis-ci.org/mvillarejo/opennms-client.png?branch=master
-        :target: https://travis-ci.org/mvillarejo/opennms-client
-.. image:: https://readthedocs.org/projects/opennms-client/badge/?version=latest
-        :target: http://opennms-client.readthedocs.org/en/latest/?badge=latest
+.. image:: https://travis-ci.org/mvillarejo/opennms_client.png?branch=master
+        :target: https://travis-ci.org/mvillarejo/opennms_client
+.. image:: https://readthedocs.org/projects/opennms_client/badge/?version=latest
+        :target: http://opennms_client.readthedocs.org/en/latest/?badge=latest
 
 
-opennms-client is a simple package to manage openNMS.
+opennms_client is a simple package to manage openNMS.
 
 Usage
 =====
 
 .. code-block:: python
 
-    >>> import client
-    >>> onms_client = client.Client("http://demo.opennms.org/opennms", "demo", "demo")
-    >>> print onms_client
+    >>> import opennms_client
+    >>> c = opennms_client.OpenNMSClient("http://demo.opennms.org/opennms", "demo", "demo")
+    >>> print c
     http://demo.opennms.org/opennms (demo) <Response [200]>
-    >>> onms_client.get_services()
+    >>> c.get_services()
     {u'Amazon': 35,
      u'BingSearch': 38,
      u'DNS': 12,
@@ -27,7 +27,7 @@ Usage
      u'FTP': 10,
      u'GoogleSearch': 36,
     ...
-    >>> onms_client.set_service("www.amazon.com ", "ICMP")
+    >>> c.set_service("www.amazon.com ", "ICMP")
     <Response [200]>
 
 
@@ -40,7 +40,7 @@ Requirements
 
 Releases
 ========
-Download pre-built releases on the [releases](https://github.com/mvillarejo/opennms-client/releases) page
+Download pre-built releases on the [releases](https://github.com/mvillarejo/opennms_client/releases) page
 
 Contributors
 ============

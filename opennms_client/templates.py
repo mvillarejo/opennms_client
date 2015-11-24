@@ -1,4 +1,11 @@
 # -*- coding: utf-8 -*-
+
+"""
+opennms_client.templates
+~~~~~~~~~~~~~~~~~~~~~
+This file contains xml templates needed by client
+
+"""
 from string import Template
 
 

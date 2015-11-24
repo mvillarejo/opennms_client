@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
 import os
 import sys
 try:
@@ -7,21 +8,25 @@ try:
 except ImportError:
     from distutils.core import setup
 
-__title__ = 'opennms-client'
-__version__ = '0.1.1'
+__title__ = 'opennms_client'
+__version__ = '0.1.2'
 __author__ = 'Manuel Villarejo'
 __author_email__ = 'mjvillarejo@gmail.com'
 __license__ = 'MIT License'
 __copyright__ = 'Copyright 2015 Manuel Villarejo'
 
 packages = [
-    # __title__ # TODO: use something more standard
-    "client"
+    __title__
 ]
+
+if sys.argv[-1] == 'build':
+    os.system('python setup.py sdist')
+    sys.exit()
 
 if sys.argv[-1] == 'publish':
     os.system('python setup.py sdist upload')
     sys.exit()
+
 
 requires = []
 with open('requirements.txt') as f:
@@ -42,7 +47,6 @@ setup(
     author=__author__,
     author_email=__author_email__,
     download_url='https://github.com/mvillarejo/%s/releases' % __title__,
-    bugtrack_url='https://github.com/mvillarejo/%s/issues' % __title__,
     platforms='any',
     keywords='%s opennms client python' % __title__,
     packages=packages,
@@ -62,7 +66,7 @@ setup(
         'Programming Language :: Python :: Implementation :: PyPy',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
-    extras_require={
-        'security': ['pyOpenSSL>=0.15.1', 'ndg-httpsclient', 'pyasn1'],
-    },
+    # extras_require={
+    #     'security': ['pyOpenSSL>=0.15.1', 'ndg-httpsclient', 'pyasn1'],
+    # },
 )

@@ -5,5 +5,5 @@ dist/
 opennms_client.egg-info/
 .DS_Store
 .idea/
-opennms-client.log
-test_client_prod.py
+opennms_client.log
+test_opennms_client_prod.py
