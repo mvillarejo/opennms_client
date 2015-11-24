@@ -2,7 +2,7 @@
 
 """
 opennms_client.templates
-~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
 This file contains xml templates needed by client
 
 """

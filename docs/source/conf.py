@@ -20,8 +20,10 @@ import shlex
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 # sys.path.insert(0, os.path.abspath('.'))
-sys.path.insert(0, os.path.abspath('..'))
-from opennms_client import __title__, __version__, __author__
+sys.path.insert(0, os.path.abspath('../..'))
+__title__ = 'opennms_client'
+__version__ = '0.1.2'
+__author__ = 'Manuel Villarejo'
 
 
 # -- General configuration ------------------------------------------------
@@ -47,6 +49,7 @@ source_suffix = '.rst'
 
 # The master toctree document.
 master_doc = 'index'
+# master_doc = 'index'
 
 # General information about the project.
 project = __title__

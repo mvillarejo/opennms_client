@@ -2,7 +2,7 @@
 
 """
 opennms_client.opennms_client
-~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This module implements client connection with OpenNMS servers
 

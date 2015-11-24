@@ -2,7 +2,7 @@
 
 """
 opennms_client.exceptions
-~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~
 This module contains the set of client's exceptions.
 """
 
