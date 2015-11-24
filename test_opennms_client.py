@@ -5,7 +5,7 @@
 import unittest
 
 import opennms_client
-from opennms_client.exceptions import OpenNMSClientConnectError
+from opennms_client.exceptions import OpenNMSClientConnectError, ServiceDoesNotExistInNodeError
 
 
 class OpenNMSClientTestCase(unittest.TestCase):
@@ -28,7 +28,12 @@ class OpenNMSClientTestCase(unittest.TestCase):
         self.client.get_services()
         self.assertEqual(self.client.services["ICMP"], 1)
 
-    # TODO: the API is not available online so can not test any further...
+    def testGetNodeServices(self):
+        self.assertEqual(self.client.get_node_services_list("www.amazon.com")[0], "Amazon")
+
+    def testDeleteNodeServiceDoesNotExistInNode(self):
+        self.assertRaises(ServiceDoesNotExistInNodeError, self.client.delete_node_service, "www.amazon.com", "ICMP")
+
 
 
 if __name__ == '__main__':

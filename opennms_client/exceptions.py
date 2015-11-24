@@ -34,3 +34,6 @@ class MoreThanOneIpInterfaceReturnedError(OpenNMSClientError):
 
 class ServiceDoesNotExistError(OpenNMSClientError):
     """Service does not exist."""
+
+class ServiceDoesNotExistInNodeError(OpenNMSClientError):
+    """Service does not exist in the node provided."""

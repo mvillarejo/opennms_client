@@ -16,7 +16,7 @@ from .log import logger
 from .urls import urls
 from .templates import templates
 from .exceptions import (OpenNMSClientConnectError, MoreThanOneNodeReturnedError, MoreThanOneIpInterfaceReturnedError,
-                         NodeDoesNotExistError, ServiceDoesNotExistError)
+                         NodeDoesNotExistError, ServiceDoesNotExistError, ServiceDoesNotExistInNodeError)
 
 
 class OpenNMSClient(object):
@@ -72,11 +72,16 @@ class OpenNMSClient(object):
                                              auth=(self.user, self.password) if self.user else None,
                                              headers=headers,
                                              verify=True)
+        elif method == "DELETE":
+            self.response = self.session.delete(url,
+                                             auth=(self.user, self.password) if self.user else None,
+                                             headers=headers,
+                                             verify=True)
         else:
             self.response = self.session.get(url, data=data,
-                                                 auth=(self.user, self.password) if self.user else None,
-                                                 headers=headers,
-                                                 verify=True)
+                                             auth=(self.user, self.password) if self.user else None,
+                                             headers=headers,
+                                             verify=True)
         self.logger.debug("Request completed. {}".format(self.response))
         return self.response
 
@@ -160,11 +165,12 @@ class OpenNMSClient(object):
         return self.services
 
     def set_service(self, hostname, service_name):
-        """
-        Add a service to a hostname
+        """ Add a service to a hostname
+
         :param hostname:
         :param service_name:
         :return:
+        :raises: ServiceDoesNotExistError
         """
         node = self.get_node(hostname)
         ip_interface = self.get_ipinterface_principal(hostname)
@@ -180,6 +186,58 @@ class OpenNMSClient(object):
         else:
             raise ServiceDoesNotExistError(
                 reason="Service with name {} does not exist ".format(service_name)
+            )
+
+    def get_node_services(self, hostname):
+        """ Get node services
+
+        :param hostname:
+        :type hostname: str
+        :return: dict
+        """
+        node = self.get_node(hostname)
+        ip_interface = self.get_ipinterface_principal(hostname)
+        url = "{0}/{1}/{2}/{3}/{4}/services".format(self.url_rest, urls['nodes'], node['id'], urls['ipinterfaces'], ip_interface['ipAddress'])
+        response = self.__request__(url).json()
+        return response
+
+    def get_node_services_list(self, hostname):
+        """ Get node services names in a list
+
+        :param hostname:
+        :type hostname: str
+        :return: list
+        """
+        services_dict = self.get_node_services(hostname)
+        return [service['serviceType']['name'] for service in services_dict['service']]
+
+
+    def delete_node_service(self, hostname, service_name):
+        """ Delete a service of a node
+
+        :param hostname:
+        :type hostname: str
+        :param service_name:
+        :type service_name: str
+        :return: dict
+        :raises: ServiceDoesNotExistInNodeError
+        """
+        node = self.get_node(hostname)
+        ip_interface = self.get_ipinterface_principal(hostname)
+        # get list of node services
+        services_list = self.get_node_services_list(hostname)
+        if service_name in services_list:
+
+            # /opennms/rest/nodes/<node_id>/ipinterfaces/<interface>/services/<service_name>
+            url = "{0}/{1}/{2}/{3}/{4}/services/{5}".format(self.url_rest, urls['nodes'], node['id'], urls['ipinterfaces'], ip_interface['ipAddress'], service_name)
+            print url
+            response = self.__request__(url, method="DELETE", headers={"Content-Type": "application/x-www-form-urlencoded"})
+            print response
+            return True
+
+        else:
+            raise ServiceDoesNotExistInNodeError(
+                reason="Service with name {} does not exist in node {}".format(service_name, hostname)
             )
 
 
