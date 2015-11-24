@@ -22,7 +22,7 @@ import shlex
 # sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath('../..'))
 __title__ = 'opennms_client'
-__version__ = '0.1.2'
+__version__ = '0.2'
 __author__ = 'Manuel Villarejo'
 
 
