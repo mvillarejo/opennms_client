@@ -33,6 +33,7 @@ class OpenNMSClient(object):
         self.url_rest = "{}/rest".format(self.url)
         self.user = user
         self.password = password
+        self.nodes = {}
         self.services = {}
 
         if debug:  # save full log to file
@@ -52,7 +53,7 @@ class OpenNMSClient(object):
         else:
             self.logger.debug("Successfully logged in")
 
-    def __request__(self, url, method="GET", data=None, headers={"Accept": "application/json"}):
+    def __request__(self, url, method="GET", data=None, headers=None):
         """
         Internal requests method with all the requirements to return json
         :param url:
@@ -66,6 +67,8 @@ class OpenNMSClient(object):
         :return:
 
         """
+        if not headers:
+            headers = {"Accept": "application/json"}
         self.logger.debug("Requesting URL: {} {} (h:{}) (d:{})".format(method, url, headers, data))
         if method == "POST":
             self.response = self.session.post(url, data=data,
@@ -92,9 +95,10 @@ class OpenNMSClient(object):
         :type limit: int
         :return: dict -- dictionary of nodes
         """
-        url = "{0}/{1}/?&limit={2}".format(self.url_rest, urls['nodes'], limit)
+        url = "{0}/{1}/?limit={2}".format(self.url_rest, urls['nodes'], limit)
         response = self.__request__(url).json()
-        return response.get('node', {})
+        self.nodes = response.get('node', {})
+        return self.nodes
 
     def get_node(self, hostname):
         """
@@ -125,14 +129,12 @@ class OpenNMSClient(object):
         """
         node = self.get_node(hostname)
         url = "{0}/{1}/{2}".format(self.url_rest, urls['nodes'], node.get('id'))
-        print url
         return self.__request__(url, method="DELETE")
 
-    def get_ipinterfaces(self, hostname, node_id=0, principal=False):
+    def get_node_ipinterfaces(self, hostname, principal=False):
         """
         Returns a list of interfaces give a hostname/node_id
         :param hostname: Hostname of the host to get interfaces from
-        :param node_id: #TODO (optional) node_id so no query for get_node() will be needed
         :param principal: return a single interface, the primary
         :return:
         """
@@ -143,7 +145,8 @@ class OpenNMSClient(object):
         if principal:
             if response.get('totalCount', 0) > 1:
                 raise MoreThanOneIpInterfaceReturnedError(
-                    reason="More than one ip interface was returned for hostname: {} (principal={})".format(hostname, principal)
+                    reason="More than one ip interface was returned for hostname: {} (principal={})".format(hostname,
+                                                                                                            principal)
                 )
             else:
                 # TODO: check that 'snmpPrimary': 'P'
@@ -151,14 +154,13 @@ class OpenNMSClient(object):
         else:
             return response.get('ipInterface', {})
 
-    def get_ipinterface_principal(self, hostname, node_id=0):
+    def get_node_ipinterface_principal(self, hostname):
         """
         Returns node principal interface
         :param hostname:
-        :param node_id:
         :return:
         """
-        return self.get_ipinterfaces(hostname, node_id, principal=True)
+        return self.get_node_ipinterfaces(hostname, principal=True)
 
     def get_services(self):
         """
@@ -177,30 +179,6 @@ class OpenNMSClient(object):
 
         return self.services
 
-    def set_node_service(self, hostname, service_name):
-        """ Add a service to a node from it's hostname
-
-        :param hostname:
-        :param service_name:
-        :return:
-        :raises: ServiceDoesNotExistError
-        """
-        node = self.get_node(hostname)
-        ip_interface = self.get_ipinterface_principal(hostname)
-        # get all the services
-        self.get_services()
-        if self.services.get(service_name, None):
-            data = templates['services'].substitute(id=self.services[service_name], name=service_name)
-            # /opennms/rest/nodes/<node_id>/ipinterfaces/<interface>/services
-            url = "{0}/{1}/{2}/{3}/{4}/services".format(self.url_rest, urls['nodes'], node['id'], urls['ipinterfaces'], ip_interface['ipAddress'])
-            response = self.__request__(url, method="POST", data=data)
-            return response
-
-        else:
-            raise ServiceDoesNotExistError(
-                reason="Service with name {} does not exist ".format(service_name)
-            )
-
     def get_node_services(self, hostname):
         """ Get node services
 
@@ -209,10 +187,11 @@ class OpenNMSClient(object):
         :return: dict
         """
         node = self.get_node(hostname)
-        ip_interface = self.get_ipinterface_principal(hostname)
-        url = "{0}/{1}/{2}/{3}/{4}/services".format(self.url_rest, urls['nodes'], node['id'], urls['ipinterfaces'], ip_interface['ipAddress'])
+        ip_interface = self.get_node_ipinterface_principal(hostname)
+        url = "{0}/{1}/{2}/{3}/{4}/services".format(self.url_rest, urls['nodes'],
+                                                    node['id'], urls['ipinterfaces'], ip_interface['ipAddress'])
         response = self.__request__(url).json()
-        return response
+        return response.get('service')
 
     def get_node_services_list(self, hostname):
         """ Get node services names in a list
@@ -222,7 +201,32 @@ class OpenNMSClient(object):
         :return: list
         """
         services_dict = self.get_node_services(hostname)
-        return [service['serviceType']['name'] for service in services_dict['service']]
+        return [service['serviceType']['name'] for service in services_dict]
+
+    def set_node_service(self, hostname, service_name):
+        """ Add a service to a node from it's hostname
+
+        :param hostname:
+        :param service_name:
+        :return:
+        :raises: ServiceDoesNotExistError
+        """
+        node = self.get_node(hostname)
+        ip_interface = self.get_node_ipinterface_principal(hostname)
+        # get all the services
+        self.get_services()
+        if self.services.get(service_name, None):
+            data = templates['services'].substitute(id=self.services[service_name], name=service_name)
+            # /opennms/rest/nodes/<node_id>/ipinterfaces/<interface>/services
+            url = "{0}/{1}/{2}/{3}/{4}/services".format(self.url_rest, urls['nodes'],
+                                                        node['id'], urls['ipinterfaces'], ip_interface['ipAddress'])
+            response = self.__request__(url, method="POST", data=data)
+            return response
+
+        else:
+            raise ServiceDoesNotExistError(
+                reason="Service with name {} does not exist ".format(service_name)
+            )
 
 
     def delete_node_service(self, hostname, service_name):
@@ -236,23 +240,23 @@ class OpenNMSClient(object):
         :raises: ServiceDoesNotExistInNodeError
         """
         node = self.get_node(hostname)
-        ip_interface = self.get_ipinterface_principal(hostname)
+        ip_interface = self.get_node_ipinterface_principal(hostname)
         # get list of node services
         services_list = self.get_node_services_list(hostname)
         if service_name in services_list:
 
             # /opennms/rest/nodes/<node_id>/ipinterfaces/<interface>/services/<service_name>
-            url = "{0}/{1}/{2}/{3}/{4}/services/{5}".format(self.url_rest, urls['nodes'], node['id'], urls['ipinterfaces'], ip_interface['ipAddress'], service_name)
-            print url
-            response = self.__request__(url, method="DELETE", headers={"Content-Type": "application/x-www-form-urlencoded"})
-            print response
+            url = "{0}/{1}/{2}/{3}/{4}/services/{5}".format(self.url_rest, urls['nodes'],
+                                                            node['id'], urls['ipinterfaces'],
+                                                            ip_interface['ipAddress'], service_name)
+            response = self.__request__(url, method="DELETE",
+                                        headers={"Content-Type": "application/x-www-form-urlencoded"})
             return True
 
         else:
             raise ServiceDoesNotExistInNodeError(
                 reason="Service with name {} does not exist in node {}".format(service_name, hostname)
             )
-
 
     def disconnect(self):
         """close session."""
