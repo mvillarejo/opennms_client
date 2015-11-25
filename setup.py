@@ -41,7 +41,7 @@ with open('README.rst') as f1:
 setup(
     name=__title__,
     version= __version__,
-    description="",
+    description="A simple package to manage openNMS.",
     long_description=long_desc,
     url='https://github.com/mvillarejo/%s' % __title__,
     license=__license__,
