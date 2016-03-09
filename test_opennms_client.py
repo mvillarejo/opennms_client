@@ -31,7 +31,7 @@ class OpenNMSClientTestCase(unittest.TestCase):
 
     def testGetNodes(self):
         self.client.get_nodes()
-        self.assertEqual(self.client.nodes[0]["label"], "accounts.internal.opennms.com")
+        self.assertEqual(self.client.nodes[0]["label"], "172.20.1.49")
 
     def testGetNode(self):
         self.assertEqual(self.client.get_node("www.amazon.com")["label"], "www.amazon.com")
