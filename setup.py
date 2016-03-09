@@ -9,7 +9,7 @@ except ImportError:
     from distutils.core import setup
 
 __title__ = 'opennms_client'
-__version__ = '0.2.1'
+__version__ = '0.2.3'
 __author__ = 'Manuel Villarejo'
 __author_email__ = 'mjvillarejo@gmail.com'
 __license__ = 'MIT License'

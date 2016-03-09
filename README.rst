@@ -78,6 +78,19 @@ Requirements
     pip install -r requirements.txt
 
 
+Errors
+======
+You might experience some errors tyring ot build ssl support, try this before installing:
+
+Mac
+.. code-block:: bash
+    export LDFLAGS="-L$(brew --prefix openssl)/lib"
+    export CFLAGS="-I$(brew --prefix openssl)/include"
+
+Linux
+.. code-block:: bash
+    yum install gcc python-devel libffi-devel openssl-devel -y
+
 Releases
 ========
 Download pre-built releases on the [releases](https://github.com/mvillarejo/opennms_client/releases) page
