@@ -203,16 +203,21 @@ class OpenNMSClient(object):
         services_dict = self.get_node_services(hostname)
         return [service['serviceType']['name'] for service in services_dict]
 
-    def set_node_service(self, hostname, service_name):
+    def set_node_service(self, hostname, service_name, index=0):
         """ Add a service to a node from it's hostname
 
         :param hostname:
         :param service_name:
+        :param index:
         :return:
         :raises: ServiceDoesNotExistError
         """
         node = self.get_node(hostname)
-        ip_interface = self.get_node_ipinterface_principal(hostname)
+        if index == 0:
+            ip_interface = self.get_node_ipinterface_principal(hostname)
+        else:
+            ip_interface = self.get_node_ipinterfaces(hostname)[index]
+            
         # get all the services
         self.get_services()
         if self.services.get(service_name, None):
