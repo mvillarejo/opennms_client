@@ -233,7 +233,6 @@ class OpenNMSClient(object):
                 reason="Service with name {} does not exist ".format(service_name)
             )
 
-
     def delete_node_service(self, hostname, service_name):
         """ Delete a service of a node
 
@@ -262,6 +261,19 @@ class OpenNMSClient(object):
             raise ServiceDoesNotExistInNodeError(
                 reason="Service with name {} does not exist in node {}".format(service_name, hostname)
             )
+
+    def alarms(self,limit=10):
+        """Alarms. """
+        url = "{0}/{1}/?limit={2}".format(self.url_rest, urls['alarms'], limit)
+        response = self.__request__(url).json()
+        return response
+
+    def healthcheck(self):
+        """healthcheck."""
+        url = "{0}/{1}/count".format(self.url_rest, urls['alarms'])
+        response = self.__request__(url, headers={"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"})
+        return response.ok
+
 
     def disconnect(self):
         """close session."""

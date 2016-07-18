@@ -10,4 +10,5 @@ urls = {
     'nodes': 'nodes',
     'services': 'element/index.jsp',
     'ipinterfaces': 'ipinterfaces',
+    'alarms': 'alarms',
 }
