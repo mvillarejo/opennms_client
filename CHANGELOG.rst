@@ -34,3 +34,7 @@ Changelog
 0.2.3 (2016-03-9)
 +++++++++++++++++
 * added instructions to avoid SSL errors in Mac and Linux
+
+0.3 (2016-07-18)
++++++++++++++++++
+* added alarms to the class
