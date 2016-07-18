@@ -18,7 +18,7 @@ class OpenNMSClientTestCase(unittest.TestCase):
     # _multiprocess_can_split_ = True
 
     def setUp(self):
-        self.client = opennms_client.OpenNMSClient("http://demo.opennms.org/opennms", "demo", "demo")
+        self.client = opennms_client.OpenNMSClient("https://demo.opennms.org/opennms", "demo", "demo")
 
     def tearDown(self):
         pass
@@ -31,33 +31,32 @@ class OpenNMSClientTestCase(unittest.TestCase):
 
     def testGetNodes(self):
         self.client.get_nodes()
-        self.assertEqual(self.client.nodes[0]["label"], "172.20.1.49")
+        self.assertEqual(self.client.nodes[0]["label"], "accounts.internal.opennms.com")
 
     def testGetNode(self):
-        self.assertEqual(self.client.get_node("www.amazon.com")["label"], "www.amazon.com")
+        self.assertEqual(self.client.get_node("demo.opennms.org")["label"], "demo.opennms.org")
 
     def testGetNodeIpInterface(self):
-        self.assertIn("205.251.242.54", [ip_interface['ipAddress'] for ip_interface in self.client.get_node_ipinterfaces("www.amazon.com")])
+        self.assertIn("96.17.15.43", [ip_interface['ipAddress'] for ip_interface in self.client.get_node_ipinterfaces("www.nasdaq.com")])
 
     def testGetNodeIpInterfacePrincipal(self):
-        self.assertIn("205.251.242.54", self.client.get_node_ipinterface_principal("www.amazon.com")['ipAddress'])
+        self.assertIn("174.143.250.51", self.client.get_node_ipinterface_principal("sync.opennms.com")['ipAddress'])
 
     def testGetServices(self):
         self.client.get_services()
         self.assertEqual(self.client.services["ICMP"], 1)
 
     def testGetNodeServices(self):
-        self.assertIn("Amazon", [service['serviceType']['name'] for service in self.client.get_node_services("www.amazon.com")])
+        self.assertIn("HTTP", [service['serviceType']['name'] for service in self.client.get_node_services("sync.opennms.com")])
 
     def testGetNodeServicesList(self):
-        self.assertIn("Amazon", self.client.get_node_services_list("www.amazon.com"))
+        self.assertIn("HTTP", self.client.get_node_services_list("sync.opennms.com"))
 
 
     def testDeleteNodeServiceDoesNotExistInNode(self):
-        self.assertRaises(ServiceDoesNotExistInNodeError, self.client.delete_node_service, "www.amazon.com", "ICMP")
+        self.assertRaises(ServiceDoesNotExistInNodeError, self.client.delete_node_service, "sync.opennms.com", "NTP")
 
 
 
 if __name__ == '__main__':
     unittest.main()
-
