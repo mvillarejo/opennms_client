@@ -214,7 +214,10 @@ class OpenNMSClient(object):
         """
         node = self.get_node(hostname)
         if index == 0:
-            ip_interface = self.get_node_ipinterface_principal(hostname)
+            try:
+                ip_interface = self.get_node_ipinterface_principal(hostname)
+            except MoreThanOneIpInterfaceReturnedError:
+                ip_interface = self.get_node_ipinterfaces(hostname)[0]
         else:
             ip_interface = self.get_node_ipinterfaces(hostname)[index]
             
